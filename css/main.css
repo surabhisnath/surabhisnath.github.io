@@ -357,9 +357,9 @@ footer {
 }
 
 /* Projects page --------------------------------------------------------- */
-#projects .panel {
+/* #projects .panel {
   margin-left: 2rem;
-}
+} */
 
 #projects .panel-default {
   border-radius: 3px;
