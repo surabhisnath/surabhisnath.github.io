@@ -371,6 +371,7 @@ footer {
 
 #projects .panel-heading {
   border-bottom: none;
+  
 }
 
 #projects .panel-heading,
@@ -382,6 +383,7 @@ footer {
 
 #projects .panel-footer {
   border-top: none;
+  height: 80px;
 }
 
 #projects .panel-heading h5 {
