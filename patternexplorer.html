@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- <link rel="stylesheet" href="style.css"> -->
+    <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    #canvas {
+      border-spacing: 0;
+      border-collapse: collapse;
+    }
+
+    #canvas td {
+      width: 25px;
+      height: 25px;
+      border: 1px solid #000;
+    }
+
+    .button {
+      background-color: black;
+      /* Green */
+      border: none;
+      color: white;
+      padding: 5px 0px;
+      width: 5%;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      display: inline-block;
+      font-size: 12px;
+      position: fixed;
+      bottom: 10%;
+      right: 50%;
+      transform: translate(50%, 50%);
+    }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- <script src="script.js" defer></script> -->
+  </head>
+  <body>
+    <table id="canvas"></table>
+    <button class="button" id="b" onclick="buttonclick()">Set</button>
+    <script>
+      let canvas = document.querySelector("#canvas");
+      var colours = new Array(16).fill("white").map(() => new Array(16).fill("white"));
+      var clickable = new Array(16).fill("yes").map(() => new Array(16).fill("yes"));
+      var graystate = false;
+
+      function logMouseButton(e) {
+        if (e.buttons == 1)
+          Draw(e.target);
+      }
+
+      function GenerateCanvas(sizeX, sizeY) {
+        for (let y = 0; y < sizeY; y++) {
+          let tr = document.createElement("tr");
+          for (let x = 0; x < sizeX; x++) {
+            let td = document.createElement("td");
+            tr.appendChild(td);
+            // td.addEventListener("mouseover", (e) => {
+            //   if (e.buttons == 1)
+            //     Draw(e.target);
+            // });
+            td.addEventListener("mouseover", logMouseButton);
+            td.addEventListener("mousedown", logMouseButton);
+          }
+          canvas.appendChild(tr);
+        }
+      }
+
+      function Draw(target) {
+        row = $(target).closest("tr").index();
+        col = $(target).closest("td").index();
+
+        if (graystate == true) {
+          if (clickable[row][col] == "yes") {
+            row = $(target).closest("tr").index();
+            col = $(target).closest("td").index();
+
+            target.style.backgroundColor = colours[row][col];
+            target.style.boxShadow = "none";
+            clickable[row][col] = "no";
+
+          }
+        } else {
+
+          if (target.style.backgroundColor != "black") {
+            target.style.backgroundColor = 'black';
+            colours[row][col] = "black";
+
+          } else {
+            target.style.backgroundColor = 'white';
+            colours[row][col] = "white";
+          }
+        }
+      }
+
+      function buttonclick() {
+        if (graystate == true) {
+          var num_boxes_clicked = 0
+          for (var i = 0; i < 16; i++) {
+            for (var j = 0; j < 16; j++) {
+              if (clickable[i][j] === "no") {
+                num_boxes_clicked++;
+              }
+            }
+          }
+
+          console.log("Number of boxes explored =", num_boxes_clicked);
+
+          colours = new Array(16).fill("white").map(() => new Array(16).fill("white"));
+
+          clickable = new Array(16).fill("yes").map(() => new Array(16).fill("yes"));
+
+          graystate = false;
+
+          var tabl = document.getElementById("canvas");
+
+          for (var i = 0, row; row = tabl.rows[i]; i++) {
+            for (var j = 0, col; col = row.cells[j]; j++) {
+              col.style.backgroundColor = "white";
+              col.style.boxShadow = "none";
+              col.addEventListener("mouseover", logMouseButton);
+            }
+          }
+
+          document.getElementById("b").innerHTML = "Set";
+
+        } else {
+          var tabl = document.getElementById("canvas");
+
+          for (var i = 0, row; row = tabl.rows[i]; i++) {
+            for (var j = 0, col; col = row.cells[j]; j++) {
+              col.style.backgroundColor = "darkgray";
+              col.style.boxShadow = "2px 2px 0px 0px gray inset";
+              col.removeEventListener("mouseover", logMouseButton);
+            }
+
+            graystate = true;
+            document.getElementById("b").innerHTML = "Reset";
+          }
+        }
+      }
+
+      GenerateCanvas(16, 16);
+    </script>
+  </body>
+</html>
