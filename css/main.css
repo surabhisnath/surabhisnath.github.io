@@ -379,11 +379,13 @@ footer {
   text-align: center;
   background: #F6F7FB;
   padding: 2rem;
+  font-weight: 500;
 }
 
 #projects .panel-footer {
   border-top: none;
   height: 80px;
+  font-weight: 500;
 }
 
 #projects .panel-heading h5 {
