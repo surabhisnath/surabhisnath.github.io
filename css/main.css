@@ -122,7 +122,7 @@ blockquote footer {
 /* Links */
 #main-container a {
   color: #000000;
-  font-weight: 500;
+/*   font-weight: 500; */
 }
 
 #main-container a:hover {
