@@ -75,6 +75,7 @@
       var totransform = url.slice(url.indexOf('=') + 1);
       var pattern_count = 0;
       var patterns = decrypt(totransform);
+      console.log(patterns);
       assert(pattern_count == patterns.length);
       var patnum = 0;
       if(pattern_count == 1)
@@ -118,7 +119,7 @@
               assert(binval.length == 4);
               for (l = 0; l < binval.length; l++)
               {
-                row.push(binval[k]);
+                row.push(binval[l]);
               }
             }
             grid.push(row);
