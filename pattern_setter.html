@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- <link rel="stylesheet" href="style.css"> -->
+    <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    #canvas {
+      border-spacing: 0;
+      border-collapse: collapse;
+    }
+
+    #canvas td {
+      width: 25px;
+      height: 25px;
+      border: 1px solid #000;
+    }
+
+    .button {
+      background: lightgray;
+      border: 1px solid;
+      color: black;
+      padding: 5px 0px;
+      width: 10%;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      display: inline-block;
+      font-size: 12px;
+      right: 50%;
+      transform: translate(0%, 50%);
+      margin: 5px;
+    }
+
+    .button:hover {
+      color:  blue;
+    }
+
+    .button:disabled {
+      background: none;
+      border: 1px solid;
+      color: gray;
+    }
+
+    </style>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- <script src="script.js" defer></script> -->
+  </head>
+
+  <body>
+    <table id="canvas"></table>
+    <button class="button" id="b" onclick="buttonclick()">Set</button>
+    <button class="button" id="l" onclick="createlink()" disabled>Create Link</button>
+    <script>
+      let canvas = document.querySelector("#canvas");
+      var patterns = [];
+      var colours = new Array(16).fill("white").map(() => new Array(16).fill("white"));
+      var pattern_count = 0;
+      function logMouseButton(e) {
+        if (e.buttons == 1)
+          Draw(e.target);
+      }
+
+      function GenerateCanvas(sizeX, sizeY) {
+        for (let y = 0; y < sizeY; y++) {
+          let tr = document.createElement("tr");
+          for (let x = 0; x < sizeX; x++) {
+            let td = document.createElement("td");
+            tr.appendChild(td);
+            td.addEventListener("mouseover", logMouseButton);
+            td.addEventListener("mousedown", logMouseButton);
+          }
+          canvas.appendChild(tr);
+        }
+      }
+
+      function Draw(target) {
+        row = $(target).closest("tr").index();
+        col = $(target).closest("td").index();
+
+        if (target.style.backgroundColor != "black") {
+          target.style.backgroundColor = 'black';
+          colours[row][col] = "black";
+
+        } else {
+          target.style.backgroundColor = 'white';
+          colours[row][col] = "white";
+        }
+      }
+
+      function buttonclick() {
+
+        if (pattern_count == 0)
+        {
+          document.getElementById("l").disabled = false;
+        }
+        
+        var temp = [];
+        for (var i = 0; i < 16; i++)
+        {
+          for (var j = 0; j < 16; j++)
+          {
+            if (colours[i][j] == "black")
+              temp.push((16 * i) + j);
+          }
+        }
+        patterns.push(temp)
+        pattern_count++;
+      
+        colours = new Array(16).fill("white").map(() => new Array(16).fill("white"));
+
+        var tabl = document.getElementById("canvas");
+        for (var i = 0, row; row = tabl.rows[i]; i++) {
+          for (var j = 0, col; col = row.cells[j]; j++) {
+            col.style.backgroundColor = "white";
+          }
+        }
+      }
+
+      function choose(choices, leng)
+      {
+          return choices[Math.floor(Math.random() * leng)];
+      }
+
+      function encrypt(json_string)
+      {
+        // a z - 0
+        // b y - 1
+        // c x - 2
+        // d w - 3
+        // e v - 4
+        // f u - 5
+        // g t - 6
+        // h s - 7
+        // i r - 8
+        // j q - 9
+        // k p 1 4 7 - [
+        // l o 2 5 8 - ]
+        // m n 3 6 9 0 - ,
+        var alphabet = "abcdefghijklmnopqrstuvwxyz";
+        var encrypted = ""
+        for (char = 0; char < json_string.length; char++)
+        {
+          if (json_string[char] == "[")
+            encrypted += choose(['k', 'p', '1', '4', '7'], 5);
+          else if (json_string[char] == "]")
+            encrypted += choose(['l', 'o', '2', '5', '8'], 5);
+          else if (json_string[char] == ",")
+            encrypted += choose(['m', 'n', '3', '6', '9', '0'], 5);
+          else
+          {
+            var val = parseInt(json_string[char]);
+            encrypted += choose([alphabet[val], alphabet[alphabet.length - 1 - val]], 2);
+          } 
+        }
+        
+        return encrypted;
+      }
+
+      function createlink() {
+        var json_string = JSON.stringify(patterns);
+        console.log(json_string);
+        var encrypted = encrypt(json_string);
+        var url = "file:///Users/surabhisnath/Desktop/pattern_explorer.html?data=" + encrypted;
+        window.document.location = url;
+      }
+
+      GenerateCanvas(16, 16);
+    </script>
+  </body>
+</html>

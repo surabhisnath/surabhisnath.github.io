@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- <link rel="stylesheet" href="style.css"> -->
+    <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    #canvas {
+      border-spacing: 0;
+      border-collapse: collapse;
+    }
+
+    #canvas td {
+      width: 25px;
+      height: 25px;
+      border: 1px solid #000;
+      background-color:  darkgray;
+      box-shadow: 2px 2px 0px 0px gray inset;
+    }
+
+    .button {
+      background: lightgray;
+      border: 1px solid;
+      color: black;
+      padding: 5px 0px;
+      width: 10%;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      display: inline-block;
+      font-size: 12px;
+      right: 50%;
+      transform: translate(0%, 50%);
+      margin: 5px;
+    }
+
+    .button:hover {
+      color: blue;
+    }
+
+    </style>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- <script src="script.js" defer></script> -->
+  </head>
+
+  <body>
+    <table id="canvas"></table>
+    <button class="button" id="b" onclick="buttonclick()">Next</button>
+    <script>
+      let canvas = document.querySelector("#canvas");
+      var clickable = new Array(16).fill("yes").map(() => new Array(16).fill("yes"));
+      var graystate = true;
+      var url = window.location.href
+      var totransform = url.slice(url.indexOf('=') + 1);
+      var toparse = decrypt(totransform);
+      console.log(toparse);
+      var patterns = JSON.parse(toparse);
+      console.log(patterns);
+      pattern_count = patterns.length;
+      var patnum = 0;
+
+      function decrypt(encrypted)
+      {
+        var decrypted = "";
+        var dict = {'a':'0', 'b':'1', 'c':'2', 'd':'3', 'e':'4', 'f':'5', 'g':'6', 'h':'7', 'i':'8', 'j':'9', 'k':'[', 'l':']', 'm':',', 'n':',', 'o':']', 'p':'[', 'q':'9', 'r':'8', 's':'7', 't':'6', 'u':'5', 'v':'4', 'w':'3', 'x':'2', 'y':'1', 'z':'0', '1':'[', '2':']', '3':',', '4':'[', '5':']', '6':',', '7':'[', '8':']', '9':',', '0':','};
+        for (char = 0; char < encrypted.length; char++)
+        {
+          decrypted += dict[encrypted[char]];
+        }
+
+        return decrypted;
+      }
+
+      function logMouseButton(e) {
+        if (e.buttons == 1)
+          Draw(e.target);
+      }
+
+      function GenerateCanvas(sizeX, sizeY) {
+        for (let y = 0; y < sizeY; y++) {
+          let tr = document.createElement("tr");
+          for (let x = 0; x < sizeX; x++) {
+            let td = document.createElement("td");
+            tr.appendChild(td);
+            td.addEventListener("mousedown", logMouseButton);
+          }
+          canvas.appendChild(tr);
+        }
+      }
+
+      function Draw(target) {
+        row = $(target).closest("tr").index();
+        col = $(target).closest("td").index();
+
+        if (clickable[row][col] == "yes") {
+          row = $(target).closest("tr").index();
+          col = $(target).closest("td").index();
+          if (patterns[patnum].indexOf(row*16 + col) != -1)
+            target.style.backgroundColor = "black";
+          else
+            target.style.backgroundColor = "white";
+          target.style.boxShadow = "none";
+          clickable[row][col] = "no";
+
+        }
+      }
+
+      function buttonclick() {
+
+        if (patnum != pattern_count) {
+          var num_boxes_clicked = 0;
+          for (var i = 0; i < 16; i++) {
+            for (var j = 0; j < 16; j++) {
+              if (clickable[i][j] === "no") {
+                num_boxes_clicked++;
+              }
+            }
+          }
+
+          console.log("Number of boxes explored =", num_boxes_clicked);
+
+          patnum++;
+          
+          if (patnum == pattern_count - 1)
+          {
+            document.getElementById("b").innerText = "Done";
+          }
+          
+          clickable = new Array(16).fill("yes").map(() => new Array(16).fill("yes"));
+
+          var tabl = document.getElementById("canvas");
+
+          for (var i = 0, row; row = tabl.rows[i]; i++) {
+            for (var j = 0, col; col = row.cells[j]; j++) {
+              col.style.backgroundColor = "darkgray";
+              col.style.boxShadow = "2px 2px 0px 0px gray inset";
+            }
+          }
+        }
+
+        if (patnum == pattern_count)
+        {
+          document.getElementById("canvas").remove();
+          document.getElementById("b").remove();
+          document.write('<div><h3 style="text-align: center; vertical-align: middle; display:inline; justify-content: center; display: flex; flex-direction: column;">Thank you for participating!</h3></div>');
+        }
+      }
+
+      GenerateCanvas(16, 16);
+    </script>
+  </body>
+</html>
