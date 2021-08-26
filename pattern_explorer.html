@@ -73,25 +73,71 @@
       var graystate = true;
       var url = window.location.href
       var totransform = url.slice(url.indexOf('=') + 1);
-      var toparse = decrypt(totransform);
-      console.log(toparse);
-      var patterns = JSON.parse(toparse);
-      console.log(patterns);
-      var pattern_count = patterns.length;
+      var pattern_count = 0;
+      var patterns = decrypt(totransform);
+      assert(pattern_count == patterns.length);
       var patnum = 0;
       if(pattern_count == 1)
         document.getElementById("b").innerText = "Done";
 
+      function assert(condition, message) {
+          if (!condition) {
+              throw message || "Assertion failed";
+          }
+      }
+
       function decrypt(encrypted)
       {
-        var decrypted = "";
-        var dict = {'a':'0', 'b':'1', 'c':'2', 'd':'3', 'e':'4', 'f':'5', 'g':'6', 'h':'7', 'i':'8', 'j':'9', 'k':'[', 'l':']', 'm':',', 'n':',', 'o':']', 'p':'[', 'q':'9', 'r':'8', 's':'7', 't':'6', 'u':'5', 'v':'4', 'w':'3', 'x':'2', 'y':'1', 'z':'0', '1':'[', '2':']', '3':',', '4':'[', '5':']', '6':',', '7':'[', '8':']', '9':',', '0':','};
-        for (char = 0; char < encrypted.length; char++)
-        {
-          decrypted += dict[encrypted[char]];
+        reversedict = {
+          '!': "0", '#': "9", '$': "7", '&': "5", '(': "14", ')': "15", '*': "1", '+': "6", ',': "15", '-': "14", '.': "12", '/': "8", '0': "4",
+          '1': "5", '2': "6", '3': "7", '4': "8", '5': "9", '6': "10", '7': "11", '8': "12", '9': "13", ':': "3", ';': "2", '@': "4", '[': "10",
+          ']': "11", 'a': "0", 'A': "15", 'b': "1", 'B': "14", 'c': "2", 'C': "13", 'd': "3", 'D': "12", 'e': "4", 'E': "11", 'f': "5", 'F': "10", 'g': "6", 'G': "9",
+          'h': "7", 'H': "8", 'I': "7", 'i': "8", 'J': "6", 'j': "9", 'K': "5", 'k': "10", 'L': "4", 'l': "11", 'M': "3", 'm': "12", 'N': "2", 'n': "13",
+          'O': "1", 'o': "14", 'P': "0", 'p': "15", 'q': "0", 'Q': "10", 'r': "1", 'R': "11", 's': "2", 'S': "12", 't': "3", 'T': "13", 'u': "4",
+          'U': "14", 'v': "5", 'V': "15", 'W': "0", 'w': "6", 'X': "1", 'x': "7", 'Y': "2", 'y': "8", 'Z': "3", 'z': "9", '~': "13"
         }
 
-        return decrypted;
+        var patt = [];
+        var allpatt = encrypted.match(/.{1,64}/g);
+        pattern_count = allpatt.length;
+
+        for(i = 0; i < pattern_count; i++)
+        {
+          grid = [];
+          groupsoffour = allpatt[i].match(/.{1,4}/g);
+          assert(groupsoffour.length == 16);
+          for (j = 0; j < groupsoffour.length; j++)
+          {
+            row = [];
+            rowinfo = groupsoffour[j];
+            assert(rowinfo.length == 4);
+            for (k = 0; k < rowinfo.length; k++)
+            {
+              decval = parseInt(reversedict[rowinfo[k]]);
+              binval = parseInt(decval, 10).toString(2).padStart(4, "0");
+              assert(binval.length == 4);
+              for (l = 0; l < binval.length; l++)
+              {
+                row.push(binval[k]);
+              }
+            }
+            grid.push(row);
+          }
+
+          patt.push(grid);
+
+        }
+
+        return patt;
+
+        // var decrypted = "";
+        // var dict = {'a':'0', 'b':'1', 'c':'2', 'd':'3', 'e':'4', 'f':'5', 'g':'6', 'h':'7', 'i':'8', 'j':'9', 'k':'[', 'l':']', 'm':',', 'n':',', 'o':']', 'p':'[', 'q':'9', 'r':'8', 's':'7', 't':'6', 'u':'5', 'v':'4', 'w':'3', 'x':'2', 'y':'1', 'z':'0', '1':'[', '2':']', '3':',', '4':'[', '5':']', '6':',', '7':'[', '8':']', '9':',', '0':','};
+        // for (char = 0; char < encrypted.length; char++)
+        // {
+        //   decrypted += dict[encrypted[char]];
+        // }
+
+        // return decrypted;
       }
 
       function logMouseButton(e) {
@@ -118,7 +164,7 @@
         if (clickable[row][col] == "yes") {
           row = $(target).closest("tr").index();
           col = $(target).closest("td").index();
-          if (patterns[patnum].indexOf(row*16 + col) != -1)
+          if (patterns[patnum][row][col] == 1)
             target.style.backgroundColor = "black";
           else
             target.style.backgroundColor = "white";

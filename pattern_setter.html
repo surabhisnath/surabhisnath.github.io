@@ -106,16 +106,19 @@
           document.getElementById("l").disabled = false;
         }
         
-        var temp = [];
+        var grid = [];
         for (var i = 0; i < 16; i++)
         {
+          var row = new Array(16).fill(0);;
           for (var j = 0; j < 16; j++)
           {
             if (colours[i][j] == "black")
-              temp.push((16 * i) + j);
+              row[j] = 1;
           }
+          grid.push(row);
         }
-        patterns.push(temp)
+
+        patterns.push(grid);
         pattern_count++;
       
         colours = new Array(16).fill("white").map(() => new Array(16).fill("white"));
@@ -133,44 +136,76 @@
           return choices[Math.floor(Math.random() * leng)];
       }
 
-      function encrypt(json_string)
+      function encrypt(patterns)
       {
-        // a z - 0
-        // b y - 1
-        // c x - 2
-        // d w - 3
-        // e v - 4
-        // f u - 5
-        // g t - 6
-        // h s - 7
-        // i r - 8
-        // j q - 9
-        // k p 1 4 7 - [
-        // l o 2 5 8 - ]
-        // m n 3 6 9 0 - ,
-        var alphabet = "abcdefghijklmnopqrstuvwxyz";
-        var encrypted = ""
-        for (char = 0; char < json_string.length; char++)
+        mapdict = {0: ['!', 'W', 'a', 'P', 'q'], 1: ['*', 'X', 'b', 'O', 'r'], 2: [';', 'Y', 'c', 'N', 's'], 3: [':', 'Z', 'd', 'M', 't'],
+                   4: ['@', '0', 'e', 'L', 'u'], 5: ['&', '1', 'f', 'K', 'v'], 6: ['+', '2', 'g', 'J', 'w'], 7: ['$', '3', 'h', 'I', 'x'],
+                   8: ['/', '4', 'i', 'H', 'y'], 9: ['#', '5', 'j', 'G', 'z'], 10: ['[', '6', 'k', 'F', 'Q'], 11: [']', '7', 'l', 'E', 'R'],
+                   12: ['.', '8', 'm', 'D', 'S'], 13: ['~', '9', 'n', 'C', 'T'], 14: ['-', '(', 'o', 'B', 'U'], 15: [',', ')', 'p', 'A', 'V']};
+        encrypted = ""
+        for (i = 0; i < pattern_count; i++)
         {
-          if (json_string[char] == "[")
-            encrypted += choose(['k', 'p', '1', '4', '7'], 5);
-          else if (json_string[char] == "]")
-            encrypted += choose(['l', 'o', '2', '5', '8'], 5);
-          else if (json_string[char] == ",")
-            encrypted += choose(['m', 'n', '3', '6', '9', '0'], 5);
-          else
+          sixtyfour = "";
+          grid = patterns[i];
+          for (rownum = 0; rownum < 16; rownum++)
           {
-            var val = parseInt(json_string[char]);
-            encrypted += choose([alphabet[val], alphabet[alphabet.length - 1 - val]], 2);
-          } 
+            four = ""
+            for (segnum = 0; segnum < 4; segnum++)
+            {
+              start = 4 * segnum;
+              bin = "";
+              for(ind = start; ind < start + 4; ind++)
+              {
+                bin += patterns[i][rownum][ind];
+              }
+
+              character = choose(mapdict[parseInt(bin, 2)], 5);
+              four += character;
+            }
+            sixtyfour += four;
+          }
+
+          encrypted += sixtyfour;
         }
 
+        console.log(encrypted);
         return encrypted;
+
+        // // a z - 0
+        // // b y - 1
+        // // c x - 2
+        // // d w - 3
+        // // e v - 4
+        // // f u - 5
+        // // g t - 6
+        // // h s - 7
+        // // i r - 8
+        // // j q - 9
+        // // k p 1 4 7 - [
+        // // l o 2 5 8 - ]
+        // // m n 3 6 9 0 - ,
+        // var alphabet = "abcdefghijklmnopqrstuvwxyz";
+        // var encrypted = ""
+        // for (char = 0; char < json_string.length; char++)
+        // {
+        //   if (json_string[char] == "[")
+        //     encrypted += choose(['k', 'p', '1', '4', '7'], 5);
+        //   else if (json_string[char] == "]")
+        //     encrypted += choose(['l', 'o', '2', '5', '8'], 5);
+        //   else if (json_string[char] == ",")
+        //     encrypted += choose(['m', 'n', '3', '6', '9', '0'], 5);
+        //   else
+        //   {
+        //     var val = parseInt(json_string[char]);
+        //     encrypted += choose([alphabet[val], alphabet[alphabet.length - 1 - val]], 2);
+        //   } 
+        // }
+
+        // return encrypted;
       }
 
       function get_short_url(long_url)
       {
-          console.log("hi");
           short_link = "";
           fetch('https://api-ssl.bitly.com/v4/shorten', 
           {
@@ -187,8 +222,6 @@
           .catch((error) => {
             console.error('Error:', error);
           });
-          console.log("bye");
-          console.log(short_link);
           return short_link;
       }
 
@@ -212,13 +245,12 @@
       function createlink() 
       {
         var shortened = "";
-        var json_string = JSON.stringify(patterns);
-        var encrypted = encrypt(json_string);
+        var encrypted = encrypt(patterns);
         var link = "https://surabhisnath.github.io/pattern_explorer.html?data=" + encrypted;
         console.log(link);
         try 
         {
-          shortened = get_short_url(link);
+          //shortened = get_short_url(link);
           if (shortened == "")
           {
             console.log("Could not shorten URL, using long URL instead");
@@ -235,6 +267,14 @@
         document.getElementById("l").innerText = "Link Copied";
         document.getElementById("b").disabled = true;
         document.getElementById("l").disabled = true;
+        var tabl = document.getElementById("canvas");
+        for (var i = 0, row; row = tabl.rows[i]; i++) {
+          for (var j = 0, col; col = row.cells[j]; j++) {
+            col.removeEventListener("mouseover", logMouseButton);
+            col.removeEventListener("mousedown", logMouseButton);
+          }
+        }
+
         //window.document.location = shortened;
       }
 
