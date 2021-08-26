@@ -64,6 +64,9 @@
       var patterns = [];
       var colours = new Array(16).fill("white").map(() => new Array(16).fill("white"));
       var pattern_count = 0;
+      var endpoint = "https://www.jsonstore.io/8ba4fd855086288421f770482e372ccb5a05d906269a34da5884f39eed0418a1";
+
+
       function logMouseButton(e) {
         if (e.buttons == 1)
           Draw(e.target);
@@ -161,19 +164,58 @@
             encrypted += choose([alphabet[val], alphabet[alphabet.length - 1 - val]], 2);
           } 
         }
-        
+
         return encrypted;
       }
 
+      function get_short_url(long_url)
+      {
+          fetch('https://api-ssl.bitly.com/v4/shorten', 
+          {
+          method: 'POST',
+          headers: {
+              'Authorization': '0ba35d9befd91b26b5d874d8e5bfae31a725b957',
+              'Content-Type': 'application/json'},
+          body: JSON.stringify({ "long_url": long_url, "domain": "bit.ly", "group_guid": "Ba1bc23dE4F" })
+          }
+          );
+      }
+
+      function copyStringToClipboard (str) {
+         // Create new element
+         var el = document.createElement('textarea');
+         // Set value (string to be copied)
+         el.value = str;
+         // Set non-editable to avoid focus and move outside of view
+         el.setAttribute('readonly', '');
+         el.style = {position: 'absolute', left: '-9999px'};
+         document.body.appendChild(el);
+         // Select text inside element
+         el.select();
+         // Copy text to clipboard
+         document.execCommand('copy');
+         // Remove temporary element
+         document.body.removeChild(el);
+      }
+
       function createlink() {
+        var shortened = "";
         var json_string = JSON.stringify(patterns);
         console.log(json_string);
         var encrypted = encrypt(json_string);
-        var url = "file:///Users/surabhisnath/Desktop/pattern_explorer.html?data=" + encrypted;
-        window.document.location = url;
+        var link = "https://surabhisnath.github.io/pattern_explorer.html?data=" + encrypted;
+        //link = get_short_url(link);
+        console.log(link);
+        copyStringToClipboard(link);        
+        document.getElementById("l").innerText = "Link Copied";
+        document.getElementById("b").disabled = true;
+        document.getElementById("l").disabled = true;
+        //window.document.location = link;
       }
 
       GenerateCanvas(16, 16);
     </script>
   </body>
 </html>
+<!-- pk_se3Fa4Bzrv3YAUja -->
+<!-- 0ba35d9befd91b26b5d874d8e5bfae31a725b957 -->

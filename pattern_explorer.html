@@ -45,6 +45,19 @@
       color: blue;
     }
 
+    .container {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      vertical-align: middle;
+      text-align: center;
+      border-color: blue;
+      width: 100%;
+      -moz-transform: translateX(50%) translateY(50%);
+      -webkit-transform: translateX(50%) translateY(50%);
+      transform: translateX(50%) translateY(50%);
+    }
+
     </style>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -115,6 +128,7 @@
         }
       }
 
+      
       function buttonclick() {
 
         if (patnum != pattern_count) {
@@ -152,7 +166,8 @@
         {
           document.getElementById("canvas").remove();
           document.getElementById("b").remove();
-          document.write('<div><h3 style="text-align: center; vertical-align: middle; display:inline; justify-content: center; display: flex; flex-direction: column;">Thank you for participating!</h3></div>');
+          // document.write('<div><h3 style="text-align: center; vertical-align: middle; display:inline; justify-content: center; display: flex; flex-direction: column;">Thank you for participating!</h3></div>');
+          document.write('<div style="color:black; position:fixed; top:50%; left:50%; transform: translateX(-50%); font-size: 20px"><span>Thank you for participating!</span></div>');
         }
       }
 
