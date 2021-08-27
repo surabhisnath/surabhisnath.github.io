@@ -67,9 +67,11 @@
   <body>
     <table id="canvas"></table>
     <button class="button" id="b" onclick="buttonclick()">Next</button>
+    <button class="button" id="h" onclick="drawheatmap()" style="visibility:hidden">View exploration heatmap</button>
     <script>
       let canvas = document.querySelector("#canvas");
       var clickable = new Array(16).fill("yes").map(() => new Array(16).fill("yes"));
+      var heatmap = new Array(16).fill("yes").map(() => new Array(16).fill(0));
       var graystate = true;
       var url = window.location.href
       var totransform = url.slice(url.indexOf('=') + 1);
@@ -84,6 +86,27 @@
       function assert(condition, message) {
           if (!condition) {
               throw message || "Assertion failed";
+          }
+      }
+
+      function drawheatmap()
+      {
+        document.getElementById("h").style.display = "none";
+        var colors = ['#4B120D', '#5C140E', '#6E160E', '#81170E', '#95180D', '#A9180C', '#BD180A', '#D31707', '#E91604', '#FF1400', '#FF3A14', '#FF6227', '#FF893B', '#FFB04F', '#FFD562', '#FFF576', '#FFFF89', '#FFFF9D', '#FFFFB1'].reverse();
+        var maxval = pattern_count + 1;
+        var chosenColors = [];
+        for(var i = 0; i < colors.length && chosenColors.length < maxval; i += Math.ceil(colors.length/maxval))
+          chosenColors.push(colors[i]);
+        var tabl = document.getElementById("canvas");
+        tabl.style.display = "block";
+        console.log(heatmap);
+        console.log(chosenColors);
+        
+        for (var i = 0, row; row = tabl.rows[i]; i++) {
+            for (var j = 0, col; col = row.cells[j]; j++) {
+              col.style.backgroundColor = chosenColors[heatmap[i][j]];
+              col.style.boxShadow = "none";
+            }
           }
       }
 
@@ -175,6 +198,12 @@
         }
       }
 
+      function endexecution()
+      {
+          
+          document.write('<div style="color:black; position:fixed; top:50%; left:50%; transform: translateX(-50%); font-size: 20px"><span>Thank you for participating!</span></div>');
+      }
+
       
       function buttonclick() {
 
@@ -184,6 +213,7 @@
             for (var j = 0; j < 16; j++) {
               if (clickable[i][j] === "no") {
                 num_boxes_clicked++;
+                heatmap[i][j] += 1;
               }
             }
           }
@@ -211,10 +241,16 @@
 
         if (patnum == pattern_count)
         {
-          document.getElementById("canvas").remove();
-          document.getElementById("b").remove();
-          // document.write('<div><h3 style="text-align: center; vertical-align: middle; display:inline; justify-content: center; display: flex; flex-direction: column;">Thank you for participating!</h3></div>');
-          document.write('<div style="color:black; position:fixed; top:50%; left:50%; transform: translateX(-50%); font-size: 20px"><span>Thank you for participating!</span></div>');
+
+          var tabl = document.getElementById("canvas");
+          for (var i = 0, row; row = tabl.rows[i]; i++) {
+            for (var j = 0, col; col = row.cells[j]; j++) {
+              col.removeEventListener("mousedown", logMouseButton);
+            }
+          }
+          document.getElementById("b").innerText = "End";
+          document.getElementById("b").onclick = endexecution;
+          document.getElementById("h").style.visibility = "visible";
         }
       }
       
