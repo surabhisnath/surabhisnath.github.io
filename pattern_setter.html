@@ -65,7 +65,7 @@
       var colours = new Array(16).fill("white").map(() => new Array(16).fill("white"));
       var pattern_count = 0;
       var endpoint = "https://www.jsonstore.io/8ba4fd855086288421f770482e372ccb5a05d906269a34da5884f39eed0418a1";
-
+      var short_link = "";
 
       function logMouseButton(e) {
         if (e.buttons == 1)
@@ -168,7 +168,6 @@
           encrypted += sixtyfour;
         }
 
-        console.log(encrypted);
         return encrypted;
 
         // // a z - 0
@@ -204,10 +203,8 @@
         // return encrypted;
       }
 
-      function get_short_url(long_url)
-      {
-          short_link = "";
-          fetch('https://api-ssl.bitly.com/v4/shorten', 
+      function fetchfn(long_url){
+        return fetch('https://api-ssl.bitly.com/v4/shorten', 
           {
           method: 'POST',
           headers: {
@@ -215,14 +212,32 @@
               'Content-Type': 'application/json'},
           body: JSON.stringify({ "long_url": long_url, "domain": "bit.ly"})
           })
-          .then(response => response.json())
+      }
+
+      function get_short_url(long_url)
+      {
+          fetchfn(long_url).then(response => response.json())
           .then(data => {
+            console.log(data);
             short_link = data["link"];
+            console.log("Short link");
+            console.log(short_link);
+            copyStringToClipboard(short_link);
+            document.getElementById("l").innerText = "Link Copied";
+            document.getElementById("b").disabled = true;
+            document.getElementById("l").disabled = true;
+            var tabl = document.getElementById("canvas");
+            for (var i = 0, row; row = tabl.rows[i]; i++) {
+              for (var j = 0, col; col = row.cells[j]; j++) {
+                col.removeEventListener("mouseover", logMouseButton);
+                col.removeEventListener("mousedown", logMouseButton);
+              }
+            }
+            //window.document.location = shortened;
           })
           .catch((error) => {
             console.error('Error:', error);
           });
-          return short_link;
       }
 
       function copyStringToClipboard (str) { // copied from https://techoverflow.net/2018/03/30/copying-strings-to-the-clipboard-using-pure-javascript/
@@ -247,35 +262,7 @@
         var shortened = "";
         var encrypted = encrypt(patterns);
         var link = "https://surabhisnath.github.io/pattern_explorer.html?data=" + encrypted;
-        console.log(link);
-        try 
-        {
-          //shortened = get_short_url(link);
-          if (shortened == "")
-          {
-            console.log("Could not shorten URL, using long URL instead");
-            shortened = link;
-          }
-        }
-        catch (error)
-        {
-          console.log("Could not shorten URL, using long URL instead");
-          shortened = link;
-        }
-        console.log(shortened); // will print on console in case doesn't copy
-        copyStringToClipboard(shortened);
-        document.getElementById("l").innerText = "Link Copied";
-        document.getElementById("b").disabled = true;
-        document.getElementById("l").disabled = true;
-        var tabl = document.getElementById("canvas");
-        for (var i = 0, row; row = tabl.rows[i]; i++) {
-          for (var j = 0, col; col = row.cells[j]; j++) {
-            col.removeEventListener("mouseover", logMouseButton);
-            col.removeEventListener("mousedown", logMouseButton);
-          }
-        }
-
-        //window.document.location = shortened;
+        get_short_url(link);
       }
 
       GenerateCanvas(16, 16);
