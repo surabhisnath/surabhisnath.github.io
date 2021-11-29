@@ -27,7 +27,8 @@
       var url = window.location.href
       // Edit: if none then default url with default patterns
       if (url.indexOf("=") == -1) // default patterns: all white, all black (2 patterns)
-        var totransform = "PPqWWPqPWWqqWWP!WaP!q!q!a!!!qaqqaqaP!aqP!PPaqPP!a!!P!qWqqqPq!aqWVAAVp,AV)),))))AAV),,)pp)VAA,)),AA,p)VpppA,,p,VpV),VA)A,pAA)pp))"
+        // var totransform = "PPqWWPqPWWqqWWP!WaP!q!q!a!!!qaqqaqaP!aqP!PPaqPP!a!!P!qWqqqPq!aqWVAAVp,AV)),))))AAV),,)pp)VAA,)),AA,p)VpppA,,p,VpV),VA)A,pAA)pp))"
+        var totransform = "abbabbabbbbbaaabbababbbabbaaabaabbbababaaaabb)())())((())(()(())))))(())()(()()(())()((((("
       else
         var totransform = url.slice(url.indexOf('=') + 1);
       var pattern_count = 0;
@@ -71,9 +72,9 @@
         reversedict = {}
 
         total_bin = Math.pow(2, segsize)
-        for (i = 0; i < total_bin; i++)
+        for (var i = 0; i < total_bin; i++)
         {
-          for (j = i * Math.floor(enckeys.length/total_bin); j < i * Math.floor(enckeys.length/total_bin) + Math.floor(enckeys.length/total_bin); j++)
+          for (var j = i * Math.floor(enckeys.length/total_bin); j < i * Math.floor(enckeys.length/total_bin) + Math.floor(enckeys.length/total_bin); j++)
             reversedict[enckeys[j]] = i
         }
 
@@ -86,21 +87,26 @@
         //   'U': "14", 'v': "5", 'V': "15", 'W': "0", 'w': "6", 'X': "1", 'x': "7", 'Y': "2", 'y': "8", 'Z': "3", 'z': "9", '~': "13"
         // }
 
+        console.log("reversedict")
+        console.log(reversedict)
+
         var patt = [];
         var encrypted_length = numseg * grid_size
-        var allpatt = encrypted.match(/.{1,encrypted_length}/g);
+        console.log(encrypted_length)
+        var allpatt = encrypted.match(/.{1,45}/g);
+        console.log(allpatt)
         pattern_count = allpatt.length;
 
         for(i = 0; i < pattern_count; i++)
         {
           grid = [];
-          groupsofseg = allpatt[i].match(/.{1,segsize}/g);
-          assert(groupsofseg.length == encrypted_length/segsize);
-          for (j = 0; j < groupsofseg.length; j++)
+          rowenc = allpatt[i].match(/.{1,3}/g);
+          assert(rowenc.length == grid_size);
+          for (j = 0; j < rowenc.length; j++)
           {
             row = [];
-            rowinfo = groupsofseg[j];
-            assert(rowinfo.length == segsize);
+            rowinfo = rowenc[j];
+            assert(rowinfo.length == numseg);
             for (k = 0; k < rowinfo.length; k++)
             {
               decval = reversedict[rowinfo[k]];
@@ -117,7 +123,8 @@
           patt.push(grid);
 
         }
-
+        console.log("patt")
+        console.log(patt)
         return patt;
 
       }
@@ -245,7 +252,7 @@
         document.getElementById("h2").style.display = "none";
         document.getElementById("h4").style.display = "none";
         document.getElementById("b").style.visibility = "visible";
-        var timelimit = 5,
+        var timelimit = 600,
         display = document.querySelector('#time');
         document.getElementById("timer").style.display = "block";
         startTimer(timelimit, display);
