@@ -1,58 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <!-- <link rel="stylesheet" href="style.css"> -->
-    <style>
-    body {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-
-    #canvas {
-      border-spacing: 0;
-      border-collapse: collapse;
-    }
-
-    #canvas td {
-      width: 25px;
-      height: 25px;
-      border: 1px solid #000;
-    }
-
-    .button {
-      background: lightgray;
-      border: 1px solid;
-      color: black;
-      padding: 5px 0px;
-      width: 10%;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      display: inline-block;
-      font-size: 12px;
-      right: 50%;
-      transform: translate(0%, 50%);
-      margin: 5px;
-    }
-
-    .button:hover {
-      color:  blue;
-    }
-
-    .button:disabled {
-      background: none;
-      border: 1px solid;
-      color: gray;
-    }
-
-    </style>
-
+    <link href="pattern_setter.css" rel="stylesheet" type="text/css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <!-- <script src="script.js" defer></script> -->
   </head>
 
   <body>
@@ -60,11 +10,13 @@
     <button class="button" id="b" onclick="buttonclick()">Set</button>
     <button class="button" id="l" onclick="createlink()" disabled>Create Link</button>
     <script>
+      var grid_size = 15
+      var segsize = 5
+      var numseg = grid_size/segsize
       let canvas = document.querySelector("#canvas");
       var patterns = [];
-      var colours = new Array(16).fill("white").map(() => new Array(16).fill("white"));
+      var colours = new Array(grid_size).fill("white").map(() => new Array(grid_size).fill("white"));
       var pattern_count = 0;
-      var endpoint = "https://www.jsonstore.io/8ba4fd855086288421f770482e372ccb5a05d906269a34da5884f39eed0418a1";
       var short_link = "";
 
       function logMouseButton(e) {
@@ -101,16 +53,18 @@
 
       function buttonclick() {
 
+        console.log(colours)
+
         if (pattern_count == 0)
         {
           document.getElementById("l").disabled = false;
         }
         
         var grid = [];
-        for (var i = 0; i < 16; i++)
+        for (var i = 0; i < grid_size; i++)
         {
-          var row = new Array(16).fill(0);;
-          for (var j = 0; j < 16; j++)
+          var row = new Array(grid_size).fill(0);;
+          for (var j = 0; j < grid_size; j++)
           {
             if (colours[i][j] == "black")
               row[j] = 1;
@@ -121,7 +75,7 @@
         patterns.push(grid);
         pattern_count++;
       
-        colours = new Array(16).fill("white").map(() => new Array(16).fill("white"));
+        colours = new Array(grid_size).fill("white").map(() => new Array(grid_size).fill("white"));
 
         var tabl = document.getElementById("canvas");
         for (var i = 0, row; row = tabl.rows[i]; i++) {
@@ -133,74 +87,62 @@
 
       function choose(choices, leng)
       {
+          console.log("choices")
+          console.log(choices)
           return choices[Math.floor(Math.random() * leng)];
       }
 
       function encrypt(patterns)
       {
-        mapdict = {0: ['!', 'W', 'a', 'P', 'q'], 1: ['*', 'X', 'b', 'O', 'r'], 2: [';', 'Y', 'c', 'N', 's'], 3: [':', 'Z', 'd', 'M', 't'],
-                   4: ['@', '0', 'e', 'L', 'u'], 5: ['&', '1', 'f', 'K', 'v'], 6: ['+', '2', 'g', 'J', 'w'], 7: ['$', '3', 'h', 'I', 'x'],
-                   8: ['/', '4', 'i', 'H', 'y'], 9: ['#', '5', 'j', 'G', 'z'], 10: ['[', '6', 'k', 'F', 'Q'], 11: [']', '7', 'l', 'E', 'R'],
-                   12: ['.', '8', 'm', 'D', 'S'], 13: ['~', '9', 'n', 'C', 'T'], 14: ['-', '(', 'o', 'B', 'U'], 15: [',', ')', 'p', 'A', 'V']};
+        enckeys = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789()!*;:@&+$/#[].~-,"
+        mapdict = {}
+        total_bin = Math.pow(2, segsize)
+        for (i = 0; i < total_bin; i++)
+        {
+          mapdict[i] = []
+          for (j = i * Math.floor(enckeys.length/total_bin); j < i * Math.floor(enckeys.length/total_bin) + Math.floor(enckeys.length/total_bin); j++)
+            mapdict[i].push(enckeys[j])
+        }
+        // mapdict = {0: ['!', 'W', 'a', 'P', 'q'], 1: ['*', 'X', 'b', 'O', 'r'], 2: [';', 'Y', 'c', 'N', 's'], 3: [':', 'Z', 'd', 'M', 't'],
+        //            4: ['@', '0', 'e', 'L', 'u'], 5: ['&', '1', 'f', 'K', 'v'], 6: ['+', '2', 'g', 'J', 'w'], 7: ['$', '3', 'h', 'I', 'x'],
+        //            8: ['/', '4', 'i', 'H', 'y'], 9: ['#', '5', 'j', 'G', 'z'], 10: ['[', '6', 'k', 'F', 'Q'], 11: [']', '7', 'l', 'E', 'R'],
+        //            12: ['.', '8', 'm', 'D', 'S'], 13: ['~', '9', 'n', 'C', 'T'], 14: ['-', '(', 'o', 'B', 'U'], 15: [',', ')', 'p', 'A', 'V']};
+        console.log(mapdict)
         encrypted = ""
         for (i = 0; i < pattern_count; i++)
         {
-          sixtyfour = "";
+          pattern_encryp = "";
           grid = patterns[i];
-          for (rownum = 0; rownum < 16; rownum++)
+          console.log("grid")
+          console.log(grid)
+          for (rownum = 0; rownum < grid_size; rownum++)
           {
-            four = ""
-            for (segnum = 0; segnum < 4; segnum++)
+            segment_encryp = ""
+            for (segnum = 0; segnum < numseg; segnum++)
             {
-              start = 4 * segnum;
+              start = segsize * segnum;
               bin = "";
-              for(ind = start; ind < start + 4; ind++)
+              for(ind = start; ind < start + segsize; ind++)
               {
                 bin += patterns[i][rownum][ind];
               }
+              console.log("bin")
+              console.log(bin)
+              console.log("int")
+              console.log(parseInt(bin, 2))
 
-              character = choose(mapdict[parseInt(bin, 2)], 5);
-              four += character;
+              character = choose(mapdict[parseInt(bin, 2)], Math.floor(enckeys.length/total_bin));
+              segment_encryp += character;
             }
-            sixtyfour += four;
+
+            pattern_encryp += segment_encryp;
           }
 
-          encrypted += sixtyfour;
+          encrypted += pattern_encryp;
         }
 
         return encrypted;
 
-        // // a z - 0
-        // // b y - 1
-        // // c x - 2
-        // // d w - 3
-        // // e v - 4
-        // // f u - 5
-        // // g t - 6
-        // // h s - 7
-        // // i r - 8
-        // // j q - 9
-        // // k p 1 4 7 - [
-        // // l o 2 5 8 - ]
-        // // m n 3 6 9 0 - ,
-        // var alphabet = "abcdefghijklmnopqrstuvwxyz";
-        // var encrypted = ""
-        // for (char = 0; char < json_string.length; char++)
-        // {
-        //   if (json_string[char] == "[")
-        //     encrypted += choose(['k', 'p', '1', '4', '7'], 5);
-        //   else if (json_string[char] == "]")
-        //     encrypted += choose(['l', 'o', '2', '5', '8'], 5);
-        //   else if (json_string[char] == ",")
-        //     encrypted += choose(['m', 'n', '3', '6', '9', '0'], 5);
-        //   else
-        //   {
-        //     var val = parseInt(json_string[char]);
-        //     encrypted += choose([alphabet[val], alphabet[alphabet.length - 1 - val]], 2);
-        //   } 
-        // }
-
-        // return encrypted;
       }
 
       function fetchfn(long_url){
@@ -265,7 +207,7 @@
         get_short_url(link);
       }
 
-      GenerateCanvas(16, 16);
+      GenerateCanvas(grid_size, grid_size);
     </script>
   </body>
 </html>

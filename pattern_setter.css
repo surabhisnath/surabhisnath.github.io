@@ -1,0 +1,45 @@
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+#canvas {
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+
+#canvas td {
+  width: 25px;
+  height: 25px;
+  border: 1px solid #000;
+}
+
+.button {
+  background: lightgray;
+  border: 1px solid;
+  color: black;
+  padding: 5px 0px;
+  width: 10%;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  display: inline-block;
+  font-size: 12px;
+  right: 50%;
+  transform: translate(0%, 50%);
+  margin: 5px;
+}
+
+.button:hover {
+  color:  blue;
+}
+
+.button:disabled {
+  background: none;
+  border: 1px solid;
+  color: gray;
+}
