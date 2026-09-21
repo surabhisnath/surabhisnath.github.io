@@ -15,7 +15,7 @@
     --teal: #2E6B63;
     --slate: #6D7180;
     --rule: rgba(35,39,53,0.14);
-    --strip-w: 5vw;
+    --strip-w: 7vw;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
@@ -122,8 +122,20 @@
   }
   .hero-top {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 28px;
+    text-align: center;
+    gap: 14px;
+    /* Cap the photo+name panel's width so it matches (and stays
+       narrower than) the body text column below -- previously this
+       row stretched to the full hero-inner width with the photo and
+       name side by side, which squeezed the name into too little
+       space and let long names spill past the edge ("cut off").
+       Stacking the photo above the name and centering both inside a
+       narrower column fixes that. */
+    width: 75%;
+    max-width: 75%;
+    margin: 0 auto;
   }
   .hero-photo {
     width: 168px;
