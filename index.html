@@ -182,7 +182,7 @@
     text-decoration: underline;
     text-decoration-color: var(--rule);
   }
-  .role a:hover { color: var(--marigold); }
+  @media (hover: hover) { .role a:hover { color: var(--marigold); } }
 
   .social-row {
     display: flex;
@@ -209,10 +209,12 @@
     border-radius: 50%;
     transition: border-color 0.2s ease, color 0.2s ease;
   }
+  @media (hover: hover) {
   .social-badge:hover { color: var(--marigold); }
   .social-badge:hover .icon-circle {
     border-color: var(--marigold);
     color: var(--marigold);
+  }
   }
   .social-badge.text-badge .icon-circle {
     font-family: 'Work Sans', sans-serif;
@@ -258,7 +260,7 @@
     font-size: 0.92rem;
   }
   .contact-line a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--rule); }
-  .contact-line a:hover { border-bottom-color: var(--marigold); color: var(--marigold); }
+  @media (hover: hover) { .contact-line a:hover { border-bottom-color: var(--marigold); color: var(--marigold); } }
 
   .about-lead {
     font-weight: 600;
@@ -424,7 +426,7 @@
     display: inline-flex;
     transition: color 0.2s ease;
   }
-  .paper-icon:hover { color: var(--marigold); }
+  @media (hover: hover) { .paper-icon:hover { color: var(--marigold); } }
   .paper-icon-disabled { color: var(--rule); }
   .paper-authors {
     font-size: 0.85rem;
@@ -1057,6 +1059,7 @@
     <section id="talks">
       <h2 class="section-title">Invited Talks</h2>
       <ul class="news-list">
+        <li class="news-item"><span class="news-date">Sep 2026</span><p class="news-title">Adobe Research, Human Computer Interaction Seminar &middot; PI: Bryan Wang</p></li>
         <li class="news-item"><span class="news-date">Sep 2025</span><p class="news-title">Toyota Motor Corporation Japan, Frontier Research &middot; PI: Ryosuke Nakanishi</p></li>
         <li class="news-item"><span class="news-date">Jan 2025</span><p class="news-title">Infosys Center for Artificial Intelligence, IIIT Delhi &middot; PI: Jainendra Shukla</p></li>
         <li class="news-item"><span class="news-date">Oct 2024</span><p class="news-title">Cognitive Neuroscience of Creativity Lab, PennState &middot; PI: Roger Beaty</p></li>
